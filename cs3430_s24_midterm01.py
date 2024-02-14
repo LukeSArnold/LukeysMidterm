@@ -14,6 +14,7 @@ import numpy.linalg
 ### put your imports from your previous/current assignments.
 from cs3430_s24_hw01 import leibnitz_det, cramers_rule
 from cs3430_s24_hw02 import bsubst, fsubst, lud_solve
+from cs3430_s24_hw04 import simplex, get_solution_from_tab
 
 ### ================ Problem 01 ========================
 
@@ -93,7 +94,11 @@ def solve_lin_sys_with_lud(A, n, b, m):
 7. If a feasible set is unbounded, then the corresponding ojective function attains its maximum/minimum value at a corner point or takes arbitrarily large positive/negative values on F.
 """
 
-
+"""
+8. The simplex algorithm only works for standard maximum problems. This is because it is continually optimizing the results of the 
+p function by choosing the most negative value in the corresponding row, and ensuring that the algorithm's chosen exit variable is 
+having the smallest impact on the basic solution column. Therefore, the algorithm is only functional for SMPs.
+"""
 
 ### ================ Problem 07 =========================
 
@@ -142,26 +147,42 @@ row 1, column 2 which has a value of 6
 ### ================ Problem 09 =========================
 
 """
-Type your answer to Problem 09 here. Be brief. Do not
-write an essay.
+Python, as well as many other programming languages, have trouble representing very small or very large
+floating point values, thus leading odd and incorrect behaviors. 
+For example, as given by lecture 3, in python, due to these properties, the following theorem holds:
+
+"There exist positive real numbers z1, z2, z3 such that z1 < z2 < z3 and
+for some real number x such that |x|>0,x+z1 =x+z2 =x+z3." 
+
+Naturally, this cannot be the case, but because very small values in python become instable, this condition 
+is true. 
 """
 
 ### ================= Problem 10 ==========================
 
 def farming_land_allocation():
-    ### Set up your tableau by replacing Nones
-    ### with appropriate values.
-    in_vars = {0:3, 1:4, 2:5}
-    m = [[2,    2,   3, 1, 0, 0, 160],
-         [5,    1,  10, 0, 1, 0, 100],
-         [-10, -6,  -2, 0, 0, 1, 0],
-         [ 1,  1.2, 2, 0, 0, 0, 0]],
-         dtype=float)
+    # x := crop A
+    # y := crop B
+    # z := crop C
 
-    tab = (m, in_vars)
+    # Total 1000 acres
+    # Total 600 acre-feet of water
+
+    # 120(x) + 80(y) + 50(z) ≤ 1000
+    # 0.5(x) + 0.33333(y) + 0.3333333(z) ≤ 600
+
+    in_vars = {0:3, 1:4, 2:5}
+    m = np.array([[120,   80,        50,          1, 0,   1000],
+                  [0.5,   0.333333, 0.3333333,    0, 1,    600],
+                  [  0,   0,          0,          0, 0,      0],
+                  [ -1,    -1.2,         -2,         0, 0,       0]],dtype=float)
+
+    tab = (in_vars, m)
     ### call simplex
     tab, solved = simplex(tab)
     ### get solution
     sol = get_solution_from_tab(tab)
+
+    print(sol)
     ### return it
     return sol
